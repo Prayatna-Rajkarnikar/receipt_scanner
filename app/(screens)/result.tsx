@@ -24,6 +24,7 @@ export default function ResultScreen() {
           setEditForm((prev) => (prev ? { ...prev, storeName: text } : prev))
         }
       />
+      <Text>{editForm?.date}</Text>
 
       {showPicker && (
         <DateTimePicker
