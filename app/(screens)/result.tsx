@@ -1,20 +1,33 @@
+import ResultLoading from "@/components/ui/result-loading";
+import { scanReceipt } from "@/lib/scan-receipt";
 import useReceipt from "@/store/receipt";
+import { Receipt } from "@/types/receipt-type";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Button, ScrollView, Text, TextInput, View } from "react-native";
 
 export default function ResultScreen() {
   const router = useRouter();
 
   const addReceipt = useReceipt((state) => state.addReceipt);
-  const draftReceipt = useReceipt((state) => state.draftReceipt);
-  const [editForm, setEditForm] = useState(draftReceipt);
+  const [editForm, setEditForm] = useState<Receipt | null>(null);
   const [showPicker, setShowPicker] = useState(false);
+  const { uri } = useLocalSearchParams<{ uri: string }>();
 
-  if (draftReceipt === null) {
-    return <Text>No receipt</Text>;
-  }
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ["scanReceipt", uri],
+    queryFn: () => scanReceipt(uri),
+    enabled: !!uri,
+  });
+
+  useEffect(() => {
+    if (data) setEditForm(data);
+  }, [data]);
+
+  if (isPending) return <ResultLoading />;
+  if (isError) return <Text>Scan failed: {error.message}</Text>;
 
   return (
     <ScrollView>

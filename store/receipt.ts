@@ -6,8 +6,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 type ReceiptStore = {
   receipts: Receipt[];
   addReceipt: (receipt: Receipt) => void;
-  draftReceipt: Receipt | null;
-  setDraft: (receipt: Receipt) => void;
 };
 
 const useReceipt = create<ReceiptStore>()(
@@ -16,8 +14,6 @@ const useReceipt = create<ReceiptStore>()(
       receipts: [],
       addReceipt: (receipt) =>
         set((state) => ({ receipts: [...state.receipts, receipt] })),
-      draftReceipt: null,
-      setDraft: (receipt) => set({ draftReceipt: receipt }),
     }),
     {
       name: "receopt-storage",
