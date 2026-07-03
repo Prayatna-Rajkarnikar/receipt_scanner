@@ -1,4 +1,5 @@
 import ResultLoading from "@/components/ui/result-loading";
+import ResultRetry from "@/components/ui/result-retryUI";
 import { scanReceipt } from "@/lib/scan-receipt";
 import useReceipt from "@/store/receipt";
 import { Receipt } from "@/types/receipt-type";
@@ -16,7 +17,7 @@ export default function ResultScreen() {
   const [showPicker, setShowPicker] = useState(false);
   const { uri } = useLocalSearchParams<{ uri: string }>();
 
-  const { data, isPending, isError, error } = useQuery({
+  const { data, isPending, isError, refetch, isRefetching } = useQuery({
     queryKey: ["scanReceipt", uri],
     queryFn: () => scanReceipt(uri),
     enabled: !!uri,
@@ -26,8 +27,8 @@ export default function ResultScreen() {
     if (data) setEditForm(data);
   }, [data]);
 
-  if (isPending) return <ResultLoading />;
-  if (isError) return <Text>Scan failed: {error.message}</Text>;
+  if (isPending || isRefetching) return <ResultLoading />;
+  if (isError) return <ResultRetry onRetry={refetch} />;
 
   return (
     <ScrollView>
